@@ -1,0 +1,92 @@
+/home/lmanchon/cesam2k20/src/
+# input file                    output file                         depth   is a type?  write variables? is a program?
+# mod_communicate
+type_object.f90                 type_object.tex                     2       1           1                0
+type_communicator.f90           type_communicator.tex               2       1           1                0
+# mod_numerique
+type_extrap_abstract.f90        type_extrap_abstract.tex            2       1           1                0
+type_extrap_real.f90            type_extrap_real.tex                2       1           1                0
+type_extrap_bspline.f90         type_extrap_bspline.tex             2       1           1                0
+adams_bashforth.f90             adams_bashforth.tex                 1       0           1                0
+adams_bashforth_real.f90        adams_bashforth_real.tex            1       0           1                0
+adams_bashforth_bspline.f90     adams_bashforth_bspline.tex         1       0           1                0
+assign_bspline2d.f90            assign_bspline2d.tex                2       0           1                0
+eval_bspline.f90                eval_bspline.tex                    2       0           1                0
+eval_bspline_window.f90         eval_bspline_window.tex             2       0           1                0
+assign_extrap.f90               assign_extrap.tex                   2       0           1                0
+dealloc_extrap.f90              dealloc_extrap.tex                  2       0           1                0
+bs_check_coherence2d.f90        bs_check_coherence2d.tex            2       0           1                0
+bsp1ddn.f90                     bsp1ddn.tex                         1       0           1                0
+gauss_leg.f90                   gauss_leg.tex                       1       0           1                0
+horner0.f90                     horner0.tex                         1       0           1                0
+pol2.f90                        pol2.tex                            1       0           1                0
+init_extrap.f90                 init_extrap.tex                     2       0           1                0
+update_extrap.f90               update_extrap.tex                   2       0           1                0
+# mod_donnees
+type_constants.f90              type_constants.tex                  1       1           1                0
+ctes_85.f90                     ctes_85.tex                         2       0           1                0
+ctes_94.f90                     ctes_94.tex                         2       0           1                0
+ctes_94m.f90                    ctes_94m.tex                        2       0           1                0
+ctes_94_asplund.f90             ctes_94_asplund.tex                 2       0           1                0
+ctes_gs98.f90                   ctes_gs98.tex                       2       0           1                0
+ctes_aag21.f90                  ctes_aag21.tex                      2       0           1                0
+type_numerical_parameters.f90   type_numerical_parameters.tex       1       1           1                0
+# mod_atm
+ball21.f90                      ball21.tex                          2       0           1                0
+roger.f90                       roger.tex                           2       0           1                0
+# mod_evol
+diffw.f90                       diffw.tex                           1       0           1                0
+diffmg_ts.f90                   diffmg_ts.tex                       1       0           1                0
+diffmg_ts_spruit2002.f90        diffmg_ts_spruit2002.tex            2       0           1                0
+diffmg_ts_maeder2004.f90        diffmg_ts_maeder2004.tex            2       0           1                0
+diffmg_ts_daniel2023.f90        diffmg_ts_daniel2023.tex            2       0           1                0
+ovshts_diff.f90                 ovshts_diff.tex                     1       0           1                0
+difft_ovs.f90                   difft_ovs.tex                       1       0           1                0
+solve_thw_tz97.f90              solve_thw_tz97.tex                  1       0           1                0
+solve_thw_mz04.f90              solve_thw_mz04.tex                  1       0           1                0
+smoothing_ts.f90                smoothing_ts.tex                    1       0           1                0
+# sub_mod_evol2d
+go_to_2D.f90                    go_to_2D.tex                        1       0           1                0
+get_geff.f90                    get_geff.tex                        1       0           1                0
+get_geff_general.f90            get_geff_general.tex                1       0           1                0
+get_rho.f90                     get_rho.tex                         1       0           1                0
+get_phi.f90                     get_phi.tex                         1       0           1                0
+get_theta_m.f90                 get_theta_m.tex                     1       0           1                0
+initialize_2d.f90               initialize_2d.tex                   1       0           1                0
+resout_rota2d.f90               resout_rota2d.tex                   1       0           1                0
+# mod_conv
+alpha_guess.f90                 alpha_guess.tex                     1       0           1                0
+conv_jmj.f90                    conv_jmj.tex                        2       0           1                0
+# mod_nuc
+abon_ini.f90                    abon_ini.tex                        1       0           1                0
+tabul_nuc.f90                   tabul_nuc.tex                       1       0           1                0
+wind.f90                        wind.tex                            1       0           1                0
+nuc.f90                         nuc.tex                             2       0           1                0
+pp1.f90                         pp1.tex                             2       0           0                0
+pp3.f90                         pp3.tex                             2       0           0                0
+ppcno9.f90                      ppcno9.tex                          2       0           0                0
+ppcno10.f90                     ppcno10.tex                         2       0           0                0
+ppcno10Fe.f90                   ppcno10Fe.tex                       2       0           0                0
+ppcno10BeBFe.f90                ppcno10BeBFe.tex                    2       0           0                0
+ppcno3a12Ne.f90                 ppcno3a12Ne.tex                     2       0           0                0
+# mod_thermo
+type_thermodynamic_var.f90      type_thermodynamic_var.tex          1       1           1                0
+eval_thermo.f90                 eval_thermo.tex                     2       0           1                0
+set_ovi_grad.f90                set_ovi_grad.tex                    2       0           1                0
+get_srhd.f90                    get_srhd.tex                        1       0           1                0
+get_srhd_ludwig99.f90           get_srhd_ludwig99.tex               2       0           0                0
+get_srhd_magic13.f90            get_srhd_magic13.tex                2       0           0                0
+get_srhd_tanner16.f90           get_srhd_tanner16.tex               2       0           0                0
+get_d_jcd11.f90                 get_d_jcd11.tex                     1       0           1                0
+# mod_static
+check_dtcontrol_crit_agemax.f90 check_dtcontrol_crit_agemax.tex     2       0           1                0
+update.f90                      update.tex                          1       0           1                0
+# mod_cesam
+type_writer.f90                 type_writer.tex                     1       1           1                0
+init_writer.f90                 init_writer.tex                     2       0           1                0
+assign_writer.f90               assign_writer.tex                   2       0           1                0
+type_hr.f90                     type_hr.tex                         1       1           1                0
+init_hr.f90                     init_hr.tex                         2       0           1                0
+assign_hr.f90                   assign_hr.tex                       2       0           1                0
+create_hr.f90                   create_hr.tex                       2       0           1                0
+cesam2k20.f90                   cesam2k20.tex                       1       1           1                1
