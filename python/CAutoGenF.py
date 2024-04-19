@@ -19,8 +19,9 @@ class CAGError( Exception ):
         self.message = message
         super().__init__( self.message )
 
-types = ['real', 'double', 'complex', 'integer', 'character', 'type', 'logical', 'class']
-procs  = ['subroutine', 'function']#, 'program']# , 'type']
+types = ['real', 'double', 'complex', 'integer', 'character', 'type', 'logical', 'class', 'interface']
+procs  = ['subroutine', 'function', 'program', 'module','interface']# , 'type'] #modif
+procs = procs + list(map(str.upper,procs))
 
 class CAutoGenF( ):
 
@@ -34,7 +35,7 @@ class CAutoGenF( ):
         "submod_etat_mhd", "submod_etat_opal5Z", "submod_etat_saha", "mod_conv", "mod_nuc", "mod_thermo",
         "mod_atm", "mod_alecian", "mod_evol", "submod_evol2d", "mod_static", "mod_cesam", "mod_exploit"}
 
-    def __init__( self, name, path='.', out='out.tex', depth=1, ttype=False, pprog=False, write_vars=True ):
+    def __init__( self, name, path='.', out='out.tex', depth=1, ttype=False, pprog=False, write_vars=True, all_var=False ):
         self.path       = path
         self.name       = name
         self.out        = out
@@ -45,10 +46,13 @@ class CAutoGenF( ):
         self.prog       = pprog
         # If False, don't write the documentation for the arguments
         self.write_vars = write_vars
+        #If True print all the variables whatever the type of var (intent in or out , local or public)
+        self.write_all_var=all_var
 
     def __deal_with_var_decl( self, line, vari, parent, init_dict=None ):
         _dict = self.dict[parent] if init_dict is None else init_dict
         words2 = line.replace('\n', '').split( sep='!' )
+        
         if words2[0][-1] != '&':
             in_var_decl = False
             _dict['vars'][vari]['decl'].append( words2[0].strip( ) )
@@ -64,9 +68,8 @@ class CAutoGenF( ):
         if self.__is_in_list( ['format', 'print', 'write'], words1[:2]):
             return None, parent
         words2 = line.replace('\n', '').split( sep='!' )
-
-
-        if 'end' in words2[0]:
+        print(words1)
+        if 'end' in words1 and not('interface' in words1):
             in_proc_decl = False
             parent       = ''
         elif words2[0][-1] == '&':
@@ -111,15 +114,51 @@ class CAutoGenF( ):
         history     = {}
         orig_author = {}
         advisor     = {}
+        modules = {}
+        callfunc={}
 
-        in_bools = {'reference':False, 'history':False, 'orig_author':False, 'advisor':False}
+        in_bools = {'reference':False, 'history':False, 'orig_author':False, 'advisor':False, 'modules':False,'callfunc':False}
 
         for line in lines:
             words = line.split()
+            print(words)
             if len(words) == 0:
                 if not np.array( list( in_bools.values() ) ).any():
                     core.append( '\n' )
                     core.append( '' )
+            
+            elif 'call' in words or 'CALL' in words: #not flawless but we have all cases + comments with call inside or alone string call => easy to spot because we display the full line
+                arg='callfunc'
+
+                if arg == 'callfunc':
+                    name = words[1].replace(':', '').strip()
+                    print(name)
+                    print("test")
+                    print(words)
+                    if len( words ) == 0:
+                        raise CAGError( f"{arg} was defined but no description was provided." )
+                    elif words[0] == ':':
+                        del words[0]
+                    if len( words ) >= 1:
+                        callfunc[name] = ' '.join( words[0:] )
+                    print(callfunc[name])
+
+            elif 'use' in words or 'use' in words:
+                arg='modules'
+                words=words[1:]
+
+                if arg == 'modules':
+                    name = words[0].replace(':', '').strip()
+                    print(name)
+                    print("test")
+                    print(words)
+                    if len( words ) == 0:
+                        raise CAGError( f"{arg} was defined but no description was provided." )
+                    elif words[0] == ':':
+                        del words[0]
+                    if len( words ) >= 1:
+                        modules[name] = ' '.join( words[0:] )
+                    print(modules[name])
 
             elif ':' in [words[0], words[0][0]]:
                 if words[0] == ':':
@@ -181,6 +220,10 @@ class CAutoGenF( ):
                 orig_author[name]          += ' ' + ' '.join( words )
             elif in_bools['advisor']:
                 advisor[name]          += ' ' + ' '.join( words )
+            elif in_bools['modules']:
+                modules[name]          += ' ' + ' '.join( words )
+            elif in_bools['callfunc']:
+                callfunc[name]          += ' ' + ' '.join( words )
             else:
                 core[-1] += ' ' + ' '.join( words )
 
@@ -189,7 +232,9 @@ class CAutoGenF( ):
             'references':references,
             'history': history,
             'orig_author': orig_author,
-            'advisor': advisor}
+            'advisor': advisor,
+            'modules': modules,
+            'callfunc':callfunc}
 
         return docstring
 
@@ -205,8 +250,9 @@ class CAutoGenF( ):
 
     def __write_var( self, var ):
         decl = ''.join(var['decl'])
-        if 'intent' not in decl and not (self.type or self.prog): return None, None, None
-
+        if  not self.write_all_var:
+            if 'intent' not in decl and not (self.type or self.prog): return None, None, None
+        
         doc  = var['doc']
         decl = decl.split( sep='::' )
         vrs  = self.__get_default( decl[1].strip() )
@@ -236,9 +282,17 @@ class CAutoGenF( ):
         self.vari         = -1
         for i, line in enumerate( lines ):
             words = line.split( )
-
             if len( words ) > 1 :
                 if len( words[0] ) > 1:
+
+                    if words[0]=="use" or words[0]=="CALL":
+                        print(words)
+                        if parent or self.type or self.prog:
+                            self.dict[parent]['doc'].append( ' '.join( words ) )
+                    elif 'call' in words or 'CALL' in words:
+                        if parent or self.type or self.prog:
+                            self.dict[parent]['doc'].append( ' '.join( words ) )
+
                     if words[0][0] == '!':
                         if words[0][1] == '!':
                             # in description
@@ -257,7 +311,9 @@ class CAutoGenF( ):
                                 var_doc    = [' '.join( words )]
                     else:
                         if words[0].lower() == 'contains':
-                            break
+                            self.dict[parent]['proc'].append(" contains ") 
+                        if words[0].lower() == 'interface':
+                            self.dict[parent]['proc'].append(" interface ")
                         if self.__is_in_list( procs, words ):
                             in_proc_decl_tmp, parent = self.__deal_with_proc_decl( i, line, parent,
                                 new_decl=True)#, init_dict=self.init_dict )
@@ -282,7 +338,9 @@ class CAutoGenF( ):
                             in_proc_decl, parent = self.__deal_with_proc_decl( i, line, parent )
             if len( words ) == 1:
                 if words[0].lower() == 'contains':
-                            break
+                    self.dict[parent]['proc'].append(" contains ") 
+                if words[0].lower() == 'interface':
+                            self.dict[parent]['proc'].append(" interface ")
                 if words[0] == '!!':
                     if parent or self.type or self.prog:
                         self.dict[parent]['doc'].append( ' ' )
@@ -364,6 +422,8 @@ class CAutoGenF( ):
                 text += '\\begin{minted}[bgcolor=codebg,linenos=false]{fortran}\n'
                 text += proc_line + '\n'
                 text += '\\end{minted}\n\n'
+
+
 
 
                 doc = self.__process_docstring( self.dict[parent]['doc'] )
@@ -485,6 +545,28 @@ class CAutoGenF( ):
             for a in docstring['advisor']:
                 descr = self.__point( self.__capitalize( self.clean_underscores( docstring['advisor'][a] ) ) )
                 text += "        \\item[$\\bullet$] %s\n" % (descr )
+            text += "    \\end{description}\n\n"
+
+        if docstring['modules']:
+            if not desc:
+                text += "\\begin{description}\n"
+                desc = True
+            text += "    \\item{\\textsf{\\textbf{Modules}}}:\n"
+            text += "    \\begin{description}\n"
+            for a in docstring['modules']:
+                descr = docstring['modules'][a]
+                text += " \\item[$\\bullet$] \\begin{verbatim} %s \\end{verbatim} \n" % (descr )
+            text += "    \\end{description}\n\n"
+
+        if docstring['callfunc']:
+            if not desc:
+                text += "\\begin{description}\n"
+                desc = True
+            text += "    \\item{\\textsf{\\textbf{Call functions}}}:\n"
+            text += "    \\begin{description}\n"
+            for a in docstring['callfunc']:
+                descr = docstring['callfunc'][a]
+                text += " \\item[$\\bullet$] \\begin{verbatim} %s \\end{verbatim} \n" % (descr )
             text += "    \\end{description}\n\n"
 
         if desc:

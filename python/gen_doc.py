@@ -25,8 +25,8 @@ if __name__ == '__main__':
     for file in files[1:]:
         if file[0][0] != '#':
             file = file.split( )
-            if len( file ) == 6:
+            if len( file ) == 7:
                 doc = CAutoGenF( file[0], out=file[1], path=path, depth=int(file[2]), ttype=bool(int(file[3])),
-                    write_vars=bool(int(file[4])), pprog=bool(int(file[5])) )
+                    write_vars=bool(int(file[4])), pprog=bool(int(file[5])), all_var=bool(int(file[6])) )
                 doc.parse()
                 doc.write_latex( )
