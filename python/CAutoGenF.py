@@ -68,7 +68,6 @@ class CAutoGenF( ):
         if self.__is_in_list( ['format', 'print', 'write'], words1[:2]):
             return None, parent
         words2 = line.replace('\n', '').split( sep='!' )
-        print(words1)
         if 'end' in words1 and not('interface' in words1):
             in_proc_decl = False
             parent       = ''
@@ -121,7 +120,6 @@ class CAutoGenF( ):
 
         for line in lines:
             words = line.split()
-            print(words)
             if len(words) == 0:
                 if not np.array( list( in_bools.values() ) ).any():
                     core.append( '\n' )
@@ -132,16 +130,13 @@ class CAutoGenF( ):
 
                 if arg == 'callfunc':
                     name = words[1].replace(':', '').strip()
-                    print(name)
-                    print("test")
-                    print(words)
                     if len( words ) == 0:
                         raise CAGError( f"{arg} was defined but no description was provided." )
                     elif words[0] == ':':
                         del words[0]
                     if len( words ) >= 1:
                         callfunc[name] = ' '.join( words[0:] )
-                    print(callfunc[name])
+
 
             elif 'use' in words or 'use' in words:
                 arg='modules'
@@ -149,16 +144,13 @@ class CAutoGenF( ):
 
                 if arg == 'modules':
                     name = words[0].replace(':', '').strip()
-                    print(name)
-                    print("test")
-                    print(words)
                     if len( words ) == 0:
                         raise CAGError( f"{arg} was defined but no description was provided." )
                     elif words[0] == ':':
                         del words[0]
                     if len( words ) >= 1:
                         modules[name] = ' '.join( words[0:] )
-                    print(modules[name])
+
 
             elif ':' in [words[0], words[0][0]]:
                 if words[0] == ':':
@@ -285,13 +277,12 @@ class CAutoGenF( ):
             if len( words ) > 1 :
                 if len( words[0] ) > 1:
 
-                    if words[0]=="use" or words[0]=="CALL":
-                        print(words)
+                    if words[0]=="use" or words[0]=="USE":
                         if parent or self.type or self.prog:
                             self.dict[parent]['doc'].append( ' '.join( words ) )
                     elif 'call' in words or 'CALL' in words:
                         if parent or self.type or self.prog:
-                            self.dict[parent]['doc'].append( ' '.join( words ) )
+                            self.dict[parent]['doc'].append( ' '.join( words ).split("(")[0] )
 
                     if words[0][0] == '!':
                         if words[0][1] == '!':
@@ -305,10 +296,10 @@ class CAutoGenF( ):
                             # in variable description
                             words[0] = words[0][2:]
                             if in_var_doc:
-                                var_doc.append( ' '.join( words ) )
+                                var_doc.append( '\\begin{verbatim} '+' '.join( words ) +' \\end{verbatim}')
                             else:
                                 in_var_doc = True
-                                var_doc    = [' '.join( words )]
+                                var_doc    = ['\\begin{verbatim} '+' '.join( words ) +' \\end{verbatim}']
                     else:
                         if words[0].lower() == 'contains':
                             self.dict[parent]['proc'].append(" contains ") 

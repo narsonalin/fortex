@@ -13,6 +13,9 @@ from CAutoGenF import CAutoGenF
 parser = argparse.ArgumentParser()
 parser.add_argument('list', type=str, default=None, help='file name with list of files' )
 
+#array to save all the comments with the form !?+letter 
+comment=[]
+
 if __name__ == '__main__':
 
     args = parser.parse_args()
@@ -30,3 +33,32 @@ if __name__ == '__main__':
                     write_vars=bool(int(file[4])), pprog=bool(int(file[5])), all_var=bool(int(file[6])) )
                 doc.parse()
                 doc.write_latex( )
+
+            #for saving all the comments 
+            f=open(path+"/"+file[0])
+            i=0
+            for k in f.readlines():
+                i+=1
+                if '!?' in k : 
+                    comment.append([file[0],str(i),k])
+            f.close()
+    
+    #for printing all the comments in a latex file with name of the file, category, nb line and the content of these comments
+    f=open("comments.tex",'w')
+    list_sec=[ "!?I : Issues","!?M : Method","!?C : Code"]
+
+    f.write(r"\chapter{Comments}"+'\n')
+    f.write(r"Here will be store all the comments in the different files of the code with the code !?."+'\n')
+
+    for i in list_sec : 
+        f.write(r"\section{"+i+r'}'+'\n')
+        for k in comment:
+            if i[0:3] in k[2]:
+                f.write(r'\begin{Verbatim}[commandchars=\\\{\},breaklines=true]'+'\n') 
+                f.write('\t'+r'\textcolor{purple}{'+k[0]+r'}:\textcolor{blue}{'+k[1]+r'}:'+k[2])
+                f.write(r'\end{Verbatim}'+'\n')
+
+    f.close()
+
+
+        
